@@ -1,53 +1,72 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * ==========================================================
  * MAIN CLASS - TrainConsistManagementApp
  * ==========================================================
- * * Use Case 6: Map Bogie to Capacity (HashMap)
+ * * Use Case 7: Sort Bogies by Capacity (Comparator)
  * * Description:
- * This class associates each bogie with its seating or
- * load capacity using a key-value mapping structure.
+ * This class sorts passenger bogies based on seating
+ * capacity using a custom Comparator.
  * * At this stage, the application:
- * - Creates a HashMap for bogie-capacity mapping
- * - Inserts capacity values for each bogie
- * - Iterates through map entries
- * - Displays bogie and capacity information
+ * - Creates bogie objects
+ * - Stores them in a list
+ * - Displays unsorted data
+ * - Sorts using Comparator logic
+ * - Displays sorted result
  */
 public class TrainConsistManagementApp {
 
-    public static void main(String[] args) {
+    // Inner Bogie class to model passenger bogies
+    static class Bogie {
+        String name;
+        int capacity;
 
-        System.out.println("==============================================");
-        System.out.println(" UC6 - Map Bogie to Capacity (HashMap) ");
-        System.out.println("==============================================\n");
-
-        // HashMap stores data in key -> value format
-        // Key (String): Bogie Name, Value (Integer): Capacity
-        Map<String, Integer> capacityMap = new HashMap<>();
-
-        // ---- Insert bogie capacities ----
-        // Using put() to associate the bogie name with its capacity
-        capacityMap.put("Sleeper", 72);
-        capacityMap.put("AC Chair Car", 56);
-        capacityMap.put("First Class", 24);
-        capacityMap.put("General", 90);
-        capacityMap.put("Pantry Car", 0);
-
-        System.out.println("Bogie Capacity Mapping (Total Items: " + capacityMap.size() + ")");
-        System.out.println("----------------------------------------------");
-
-        // ---- Iterate through map entries ----
-        // entrySet() allows us to access both the Key and Value in one loop
-        for (Map.Entry<String, Integer> entry : capacityMap.entrySet()) {
-            String bogieName = entry.getKey();
-            Integer capacity = entry.getValue();
-
-            System.out.println("Bogie Type: " + bogieName + " | Capacity: " + capacity + " seats");
+        Bogie(String name, int capacity) {
+            this.name = name;
+            this.capacity = capacity;
         }
 
-        System.out.println("----------------------------------------------");
-        System.out.println("Mapping complete. Fast lookup enabled for operational planning.");
+        @Override
+        public String toString() {
+            return String.format("Bogie: %-15s | Capacity: %d seats", name, capacity);
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("==============================================");
+        System.out.println(" UC7 - Sort Bogies by Capacity (Comparator) ");
+        System.out.println("==============================================\n");
+
+        // 1. Create a List of Bogie objects
+        List<Bogie> bogieList = new ArrayList<>();
+        bogieList.add(new Bogie("Sleeper", 72));
+        bogieList.add(new Bogie("First Class", 24));
+        bogieList.add(new Bogie("AC Chair Car", 56));
+        bogieList.add(new Bogie("General", 90));
+
+        // 2. Display Unsorted Data
+        System.out.println("Unsorted Bogie List:");
+        bogieList.forEach(System.out::println);
+        System.out.println();
+
+        // 3. Sort using Comparator logic (Ascending by Capacity)
+        // Using Lambda expression for concise comparison
+        bogieList.sort(Comparator.comparingInt(b -> b.capacity));
+
+        // 4. Display Sorted Result (Ascending)
+        System.out.println("Sorted Bogie List (Ascending Capacity):");
+        bogieList.forEach(System.out::println);
+        System.out.println();
+
+        // 5. Bonus: Sort using Comparator logic (Descending by Capacity)
+        System.out.println("Sorted Bogie List (Descending Capacity):");
+        bogieList.sort(Comparator.comparingInt((Bogie b) -> b.capacity).reversed());
+        bogieList.forEach(System.out::println);
+
+        System.out.println("\n----------------------------------------------");
+        System.out.println("Sorting complete. Optimal usage planning enabled.");
     }
 }

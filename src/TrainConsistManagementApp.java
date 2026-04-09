@@ -1,62 +1,71 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
- * UC11: Validate Train ID & Cargo Codes using Regular Expressions
+ * UC12: Safety Compliance Check for Goods Bogies
  */
 public class TrainConsistManagementApp {
 
-    // Regex Patterns
-    private static final Pattern TRAIN_ID_PATTERN = Pattern.compile("^TRN\\d{3}$");
-    private static final Pattern CARGO_CODE_PATTERN = Pattern.compile("^CG\\d{3}$");
+    // Goods Bogie Class
+    static class GoodsBogie {
+        private String bogieId;
+        private String type;
+        private String cargoType;
+        private int load;
 
-    // Method to validate Train ID
-    public static boolean validateTrainId(String trainId) {
-        return TRAIN_ID_PATTERN.matcher(trainId).matches();
-    }
+        public GoodsBogie(String bogieId, String type, String cargoType, int load) {
+            this.bogieId = bogieId;
+            this.type = type;
+            this.cargoType = cargoType;
+            this.load = load;
+        }
 
-    // Method to validate Cargo Code
-    public static boolean validateCargoCode(String cargoCode) {
-        return CARGO_CODE_PATTERN.matcher(cargoCode).matches();
+        // Method to check safety compliance
+        public boolean isCompliant() {
+            if (type.equalsIgnoreCase("Rectangular")) {
+                return load <= 100;
+            } else if (type.equalsIgnoreCase("Cylindrical")) {
+                return load <= 80;
+            }
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            return bogieId + " | Type: " + type +
+                    " | Cargo: " + cargoType +
+                    " | Load: " + load + " tons";
+        }
     }
 
     public static void main(String[] args) {
 
-        System.out.println("===============================================");
-        System.out.println(" UC11 - Validate Train ID & Cargo Codes ");
-        System.out.println("===============================================\n");
+        System.out.println("==================================================");
+        System.out.println(" UC12 - Safety Compliance Check for Goods Bogies ");
+        System.out.println("==================================================\n");
 
-        // Sample Train IDs
-        String trainId1 = "TRN101";
-        String trainId2 = "TRN20A";
+        // Step 1: Create list of goods bogies
+        List<GoodsBogie> goodsBogies = new ArrayList<>();
+        goodsBogies.add(new GoodsBogie("GB101", "Rectangular", "General Goods", 90));
+        goodsBogies.add(new GoodsBogie("GB102", "Rectangular", "Machinery", 110)); // Non-compliant
+        goodsBogies.add(new GoodsBogie("GB103", "Cylindrical", "Petroleum", 70));
+        goodsBogies.add(new GoodsBogie("GB104", "Cylindrical", "Chemicals", 85)); // Non-compliant
 
-        // Sample Cargo Codes
-        List<String> cargoCodes = new ArrayList<>();
-        cargoCodes.add("CG501");
-        cargoCodes.add("CG502");
-        cargoCodes.add("CG50A"); // Invalid
-        cargoCodes.add("CG503");
+        // Step 2: Check and display safety compliance
+        System.out.println("Safety Compliance Report:\n");
 
-        // Validate Train IDs
-        System.out.println("Train ID Validation:");
-        System.out.println(trainId1 + " -> " +
-                (validateTrainId(trainId1) ? "Valid" : "Invalid"));
-        System.out.println(trainId2 + " -> " +
-                (validateTrainId(trainId2) ? "Valid" : "Invalid"));
-
-        // Validate Cargo Codes
-        System.out.println("\nCargo Code Validation:");
-        for (String code : cargoCodes) {
-            System.out.println(code + " -> " +
-                    (validateCargoCode(code) ? "Valid" : "Invalid"));
+        for (GoodsBogie bogie : goodsBogies) {
+            String status = bogie.isCompliant() ? "COMPLIANT" : "NON-COMPLIANT";
+            System.out.println(bogie + " --> " + status);
         }
 
-        // Count valid cargo codes
-        long validCargoCount = cargoCodes.stream()
-                .filter(TrainConsistManagementApp::validateCargoCode)
+        // Step 3: Count compliant bogies using Streams
+        long compliantCount = goodsBogies.stream()
+                .filter(GoodsBogie::isCompliant)
                 .count();
 
-        System.out.println("\nTotal Valid Cargo Codes: " + validCargoCount);
+        System.out.println("\nTotal Compliant Bogies: " + compliantCount);
+        System.out.println("Total Non-Compliant Bogies: "
+                + (goodsBogies.size() - compliantCount));
     }
 }

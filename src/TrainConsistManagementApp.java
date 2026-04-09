@@ -2,70 +2,77 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * UC12: Safety Compliance Check for Goods Bogies
+ * UC13: Performance Comparison (Loops vs Streams)
  */
 public class TrainConsistManagementApp {
 
-    // Goods Bogie Class
-    static class GoodsBogie {
-        private String bogieId;
+    // Bogie Class
+    static class Bogie {
+        private String name;
         private String type;
-        private String cargoType;
-        private int load;
+        private int capacity;
 
-        public GoodsBogie(String bogieId, String type, String cargoType, int load) {
-            this.bogieId = bogieId;
+        public Bogie(String name, String type, int capacity) {
+            this.name = name;
             this.type = type;
-            this.cargoType = cargoType;
-            this.load = load;
+            this.capacity = capacity;
         }
 
-        // Method to check safety compliance
-        public boolean isCompliant() {
-            if (type.equalsIgnoreCase("Rectangular")) {
-                return load <= 100;
-            } else if (type.equalsIgnoreCase("Cylindrical")) {
-                return load <= 80;
-            }
-            return false;
+        public int getCapacity() {
+            return capacity;
         }
 
-        @Override
-        public String toString() {
-            return bogieId + " | Type: " + type +
-                    " | Cargo: " + cargoType +
-                    " | Load: " + load + " tons";
+        public String getType() {
+            return type;
         }
     }
 
     public static void main(String[] args) {
 
-        System.out.println("==================================================");
-        System.out.println(" UC12 - Safety Compliance Check for Goods Bogies ");
-        System.out.println("==================================================\n");
+        System.out.println("====================================================");
+        System.out.println(" UC13 - Performance Comparison (Loops vs Streams) ");
+        System.out.println("====================================================");
 
-        // Step 1: Create list of goods bogies
-        List<GoodsBogie> goodsBogies = new ArrayList<>();
-        goodsBogies.add(new GoodsBogie("GB101", "Rectangular", "General Goods", 90));
-        goodsBogies.add(new GoodsBogie("GB102", "Rectangular", "Machinery", 110)); // Non-compliant
-        goodsBogies.add(new GoodsBogie("GB103", "Cylindrical", "Petroleum", 70));
-        goodsBogies.add(new GoodsBogie("GB104", "Cylindrical", "Chemicals", 85)); // Non-compliant
+        // Create list of bogies
+        List<Bogie> bogies = new ArrayList<>();
 
-        // Step 2: Check and display safety compliance
-        System.out.println("Safety Compliance Report:\n");
-
-        for (GoodsBogie bogie : goodsBogies) {
-            String status = bogie.isCompliant() ? "COMPLIANT" : "NON-COMPLIANT";
-            System.out.println(bogie + " --> " + status);
+        for (int i = 0; i < 1_000_000; i++) {
+            bogies.add(new Bogie("Sleeper", "Passenger", 72));
+            bogies.add(new Bogie("AC Chair", "Passenger", 54));
+            bogies.add(new Bogie("First Class", "Passenger", 24));
         }
 
-        // Step 3: Count compliant bogies using Streams
-        long compliantCount = goodsBogies.stream()
-                .filter(GoodsBogie::isCompliant)
-                .count();
+        // Loop-based calculation
+        long startLoop = System.nanoTime();
 
-        System.out.println("\nTotal Compliant Bogies: " + compliantCount);
-        System.out.println("Total Non-Compliant Bogies: "
-                + (goodsBogies.size() - compliantCount));
+        int totalSeatsLoop = 0;
+        for (Bogie b : bogies) {
+            if (b.getType().equalsIgnoreCase("Passenger")) {
+                totalSeatsLoop += b.getCapacity();
+            }
+        }
+
+        long endLoop = System.nanoTime();
+        long loopTime = endLoop - startLoop;
+
+        // Stream-based calculation
+        long startStream = System.nanoTime();
+
+        int totalSeatsStream = bogies.stream()
+                .filter(b -> b.getType().equalsIgnoreCase("Passenger"))
+                .mapToInt(Bogie::getCapacity)
+                .sum();
+
+        long endStream = System.nanoTime();
+        long streamTime = endStream - startStream;
+
+        // Output Results
+        System.out.println("\nTotal Seats (Loop): " + totalSeatsLoop);
+        System.out.println("Execution Time (Loop): " + loopTime + " ns");
+
+        System.out.println("\nTotal Seats (Stream): " + totalSeatsStream);
+        System.out.println("Execution Time (Stream): " + streamTime + " ns");
+
+        System.out.println("\nPerformance Comparison Completed.");
     }
 }
